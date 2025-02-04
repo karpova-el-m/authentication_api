@@ -8,9 +8,13 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import (LoginSerializer, LogoutSerializer,
-                          RegisterSerializer, TokenRefreshSerializer,
-                          UserDetailSerializer)
+from .serializers import (
+    LoginSerializer,
+    LogoutSerializer,
+    RegisterSerializer,
+    TokenRefreshSerializer,
+    UserDetailSerializer,
+)
 
 User = get_user_model()
 
@@ -22,8 +26,7 @@ class RegisterAPIView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             return super().create(request, *args, **kwargs)
-        except ValidationError as e:
-            print(f"Validation error: {e}")
+        except ValidationError:
             raise
 
 
@@ -31,8 +34,12 @@ class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            user = User.objects.filter(email=serializer.validated_data["email"]).first()
-            if user and user.check_password(serializer.validated_data["password"]):
+            user = User.objects.filter(
+                email=serializer.validated_data["email"]
+            ).first()
+            if user and user.check_password(
+                serializer.validated_data["password"]
+            ):
                 refresh = RefreshToken.for_user(user)
                 return Response(
                     {
@@ -67,19 +74,6 @@ class TokenRefreshView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LogMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        print(
-            f"Request path: {request.path}, Method: {request.method}, Headers: {request.headers}"
-        )
-        response = self.get_response(request)
-        print(f"Response status: {response.status_code}")
-        return response
-
-
 class LogoutView(APIView):
     permission_classes = [AllowAny]
 
@@ -94,9 +88,15 @@ class LogoutView(APIView):
                     {"success": "User logged out."}, status=status.HTTP_200_OK
                 )
             except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": str(e)},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class UserDetailView(APIView):
@@ -108,7 +108,11 @@ class UserDetailView(APIView):
         return Response(serializer.data)
 
     def put(self, request):
-        serializer = UserDetailSerializer(request.user, data=request.data, partial=True)
+        serializer = UserDetailSerializer(
+            request.user,
+            data=request.data,
+            partial=True
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

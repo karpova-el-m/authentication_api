@@ -7,7 +7,7 @@ django-constance==4.3.1
 django-extensions==3.2.3
 djangorestframework==3.15.2
 djangorestframework_simplejwt==5.4.0
-drf-spectacular==0.28.0
+drf-yasg==1.21.8
 flake8==7.1.1
 inflection==0.5.1
 isort==6.0.0
@@ -22,6 +22,7 @@ pycodestyle==2.12.1
 pyflakes==3.2.0
 PyJWT==2.10.1
 python-dotenv==1.0.1
+pytz==2025.1
 PyYAML==6.0.2
 referencing==0.36.2
 rpds-py==0.22.3

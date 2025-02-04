@@ -32,7 +32,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def validate_email(self, value):
         if not value:
-            raise serializers.ValidationError({"email": "This field is required."})
+            raise serializers.ValidationError(
+                {"email": "This field is required."}
+            )
         return value
 
     def to_representation(self, instance):
@@ -61,9 +63,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
             serializer = UserDetailSerializer(request.user)
             return Response(serializer.data)
         except Exception as e:
-            print(f"Error: {e}")
             return Response(
-                {"detail": "An error occurred"},
+                {"detail": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 

@@ -23,11 +23,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "rest_framework",
-    "rest_framework_simplejwt",
     "constance",
     "constance.backends.database",
     "drf_spectacular",
     'django_extensions',
+    "rest_framework_simplejwt",
     'rest_framework_simplejwt.token_blacklist',
 ]
 
@@ -110,8 +110,15 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 

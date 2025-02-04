@@ -1,18 +1,16 @@
 from django.contrib.auth import get_user_model
-from rest_framework import status, viewsets
+from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework import generics
-from .serializers import (
-    RegisterSerializer, LoginSerializer, TokenRefreshSerializer, LogoutSerializer, UserDetailSerializer
-)
+from rest_framework_simplejwt.tokens import RefreshToken
 
-import logging
-logging.basicConfig(level=logging.INFO)
+from .serializers import (LoginSerializer, LogoutSerializer,
+                          RegisterSerializer, TokenRefreshSerializer,
+                          UserDetailSerializer)
 
 User = get_user_model()
 
@@ -33,14 +31,19 @@ class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            user = User.objects.filter(email=serializer.validated_data['email']).first()
-            if user and user.check_password(serializer.validated_data['password']):
+            user = User.objects.filter(email=serializer.validated_data["email"]).first()
+            if user and user.check_password(serializer.validated_data["password"]):
                 refresh = RefreshToken.for_user(user)
-                return Response({
-                    'access_token': str(refresh.access_token),
-                    'refresh_token': str(refresh)
-                })
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(
+                    {
+                        "access_token": str(refresh.access_token),
+                        "refresh_token": str(refresh),
+                    }
+                )
+        return Response(
+            {"error": "Invalid credentials"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
 
 
 class TokenRefreshView(APIView):
@@ -48,15 +51,33 @@ class TokenRefreshView(APIView):
         serializer = TokenRefreshSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                refresh_token = serializer.validated_data['refresh_token']
+                refresh_token = serializer.validated_data["refresh_token"]
                 token = RefreshToken(refresh_token)
-                return Response({
-                    'access_token': str(token.access_token),
-                    'refresh_token': str(token)
-                })
+                return Response(
+                    {
+                        "access_token": str(token.access_token),
+                        "refresh_token": str(token),
+                    }
+                )
             except TokenError:
-                return Response({"error": "Invalid token or expired refresh token"}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(
+                    {"error": "Invalid token or expired refresh token"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        print(
+            f"Request path: {request.path}, Method: {request.method}, Headers: {request.headers}"
+        )
+        response = self.get_response(request)
+        print(f"Response status: {response.status_code}")
+        return response
 
 
 class LogoutView(APIView):
@@ -65,11 +86,13 @@ class LogoutView(APIView):
     def post(self, request):
         serializer = LogoutSerializer(data=request.data)
         if serializer.is_valid():
-            refresh_token = serializer.validated_data['refresh_token']
+            refresh_token = serializer.validated_data["refresh_token"]
             try:
                 token = RefreshToken(refresh_token)
                 token.blacklist()
-                return Response({"success": "User logged out."}, status=status.HTTP_200_OK)
+                return Response(
+                    {"success": "User logged out."}, status=status.HTTP_200_OK
+                )
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -78,16 +101,14 @@ class LogoutView(APIView):
 
 class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def get(self, request):
         serializer = UserDetailSerializer(request.user)
-        logging.info(f"Token: {request.headers}")
         return Response(serializer.data)
 
     def put(self, request):
         serializer = UserDetailSerializer(request.user, data=request.data, partial=True)
-        logging.info(f"Token: {request.headers.get('Authorization')}")
-        logging.info(f"Token: {request.headers}")
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

@@ -26,6 +26,11 @@ Develop a REST API for user authentication and authorization using Django and Dj
 git clone https://github.com/karpova-el-m/authentication_api
 cd authentication_api
 ```
+* ### Create the .env file:
+```
+Create a .env file at the root of the project and add the necessary environment variables. 
+Ensure that the .env file is added to .gitignore to prevent it from being included in version control.
+```
 
 * ### Create and Activate Virtual Environment:
 ```

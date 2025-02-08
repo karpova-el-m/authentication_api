@@ -119,12 +119,13 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
+CONSTANCE_BACKEND = 'constance.backends.redisd.RedisBackend'
 
 CONSTANCE_REDIS_CONNECTION = {
-    "host": "localhost",
-    "port": 6379,
-    "db": 0,
+    'host': 'my-redis-1234.onrender.com',
+    'port': 6379,
+    'password': None,
+    'decode_responses': True,
 }
 
 CONSTANCE_CONFIG = {

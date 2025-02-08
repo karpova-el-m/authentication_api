@@ -141,7 +141,3 @@ SIMPLE_JWT = {
 }
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-CORS_ALLOWED_ORIGINS = [
-    "https://your-app-name.herokuapp.com",
-]

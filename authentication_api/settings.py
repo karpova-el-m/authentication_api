@@ -1,7 +1,8 @@
 import os
-from pathlib import Path
-from constance import config
 from datetime import timedelta
+from pathlib import Path
+
+from constance import config
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,8 +16,8 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 INSTALLED_APPS = [
+    "corsheaders",
     "constance",
-    "constance.backends.database",
     "api.apps.ApiConfig",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -34,6 +35,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "api.User"
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -41,6 +43,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "authentication_api.urls"
@@ -95,31 +98,50 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=config.ACCESS_TOKEN_LIFETIME),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=config.REFRESH_TOKEN_LIFETIME),
-    "AUTH_HEADER_TYPES": ("Bearer",),
-    "BLACKLIST_AFTER_ROTATION": True,
-    "ROTATE_REFRESH_TOKENS": True,
-    "UPDATE_LAST_LOGIN": True,
-}
+ACCESS_TOKEN_LIFETIME = timedelta(minutes=30)
+
+REFRESH_TOKEN_LIFETIME = timedelta(days=30)
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
 }
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
+CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
+
+CONSTANCE_REDIS_CONNECTION = {
+    "host": "localhost",
+    "port": 6379,
+    "db": 0,
+}
 
 CONSTANCE_CONFIG = {
     "ACCESS_TOKEN_LIFETIME": (30, "Access Token lifetime in seconds"),
     "REFRESH_TOKEN_LIFETIME": (30, "Refresh Token lifetime in days"),
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=config.ACCESS_TOKEN_LIFETIME),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=config.REFRESH_TOKEN_LIFETIME),
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ROTATE_REFRESH_TOKENS": True,
+    "UPDATE_LAST_LOGIN": True,
+}
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+CORS_ALLOWED_ORIGINS = [
+    "https://your-app-name.herokuapp.com",
+]

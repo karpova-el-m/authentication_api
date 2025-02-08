@@ -17,6 +17,7 @@ Develop a REST API for user authentication and authorization using Django and Dj
 * __Backend:__ Django, Django REST Framework
 * __Authentication:__ JSON Web Tokens (JWT) for Access tokens; UUID for Refresh tokens
 * __Configuration Management:__ django-constance for token lifetimes
+* __Caching and Sessions:__ Redis for caching and session management
 * __Testing:__ Unit and integration tests for API endpoints
 
 ## Setup and Installation
@@ -36,6 +37,46 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 * ### Install Dependencies:
 ```
 pip install -r requirements.txt
+```
+
+* ### Install Redis (if not installed):
+Ensure that Redis is installed and running on your local machine or use a Redis service (e.g., RedisLabs).
+
+__For macOS:__
+```
+brew install redis
+```
+
+__For Ubuntu/Debian:__
+```
+sudo apt update
+sudo apt install redis-server
+```
+
+__Start Redis:__
+```
+redis-server
+```
+
+__Configure Redis (optional):__
+In your settings.py, ensure that the CACHES and CONSTANCE_REDIS_CONNECTION settings are configured to use Redis:
+```
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # Change if needed
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+CONSTANCE_BACKEND = 'constance.backends.redisd.RedisBackend'
+CONSTANCE_REDIS_CONNECTION = {
+    'host': 'localhost',
+    'port': 6379,
+    'db': 1,
+}
 ```
 
 * ### Apply Migrations:

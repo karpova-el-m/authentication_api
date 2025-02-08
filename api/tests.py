@@ -30,7 +30,7 @@ class UserAPITest(APITestCase):
             {
                 "email": "test2@example.com",
                 "password": "password",
-                "username": ""
+                "username": "",
             },
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -40,7 +40,7 @@ class UserAPITest(APITestCase):
             self.login_url,
             {
                 "email": self.user_data["email"],
-                "password": self.user_data["password"]
+                "password": self.user_data["password"],
             },
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -50,8 +50,7 @@ class UserAPITest(APITestCase):
     def test_access_token_refresh(self):
         refresh = RefreshToken.for_user(self.user)
         response = self.client.post(
-            self.refresh_url,
-            {"refresh_token": str(refresh)}
+            self.refresh_url, {"refresh_token": str(refresh)}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("access_token", response.data)
@@ -59,8 +58,7 @@ class UserAPITest(APITestCase):
     def test_user_logout(self):
         refresh = RefreshToken.for_user(self.user)
         response = self.client.post(
-            self.logout_url,
-            {"refresh_token": str(refresh)}
+            self.logout_url, {"refresh_token": str(refresh)}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["success"], "User logged out.")
@@ -108,8 +106,7 @@ class UserAPITest(APITestCase):
     def test_access_token_refresh_invalid_token(self):
         invalid_token = "invalid.token.value"
         response = self.client.post(
-            self.refresh_url,
-            {"refresh_token": invalid_token}
+            self.refresh_url, {"refresh_token": invalid_token}
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertIn("error", response.data)
@@ -119,8 +116,7 @@ class UserAPITest(APITestCase):
 
     def test_user_logout_invalid_token(self):
         response = self.client.post(
-            self.logout_url,
-            {"refresh_token": "invalid_token"}
+            self.logout_url, {"refresh_token": "invalid_token"}
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("error", response.data)

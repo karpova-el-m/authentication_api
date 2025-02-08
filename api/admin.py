@@ -9,12 +9,21 @@ User = get_user_model()
 class CustomUserAdmin(UserAdmin):
     filter_horizontal = []
     ordering = ["email"]
-    list_display = ["email", "username", "is_active", "is_staff", "is_superuser"]
+    list_display = [
+        "email",
+        "username",
+        "is_active",
+        "is_staff",
+        "is_superuser",
+    ]
     list_filter = ["is_staff", "is_superuser", "is_active"]
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         (("Personal Info"), {"fields": ("username",)}),
-        (("Permissions"), {"fields": ("is_active", "is_staff", "is_superuser")}),
+        (
+            ("Permissions"),
+            {"fields": ("is_active", "is_staff", "is_superuser")},
+        ),
         (("Important dates"), {"fields": ("last_login",)}),
     )
     add_fieldsets = (

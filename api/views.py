@@ -8,13 +8,9 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import (
-    LoginSerializer,
-    LogoutSerializer,
-    RegisterSerializer,
-    TokenRefreshSerializer,
-    UserDetailSerializer,
-)
+from .serializers import (LoginSerializer, LogoutSerializer,
+                          RegisterSerializer, TokenRefreshSerializer,
+                          UserDetailSerializer)
 
 User = get_user_model()
 
@@ -22,6 +18,7 @@ User = get_user_model()
 class RegisterAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -31,6 +28,8 @@ class RegisterAPIView(generics.CreateAPIView):
 
 
 class LoginView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -49,11 +48,13 @@ class LoginView(APIView):
                 )
         return Response(
             {"error": "Invalid credentials"},
-            status=status.HTTP_401_UNAUTHORIZED
+            status=status.HTTP_401_UNAUTHORIZED,
         )
 
 
 class TokenRefreshView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = TokenRefreshSerializer(data=request.data)
         if serializer.is_valid():
@@ -89,13 +90,11 @@ class LogoutView(APIView):
                 )
             except Exception as e:
                 return Response(
-                    {"error": str(e)},
-                    status=status.HTTP_400_BAD_REQUEST
+                    {"error": str(e)}, status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
 
@@ -109,9 +108,7 @@ class UserDetailView(APIView):
 
     def put(self, request):
         serializer = UserDetailSerializer(
-            request.user,
-            data=request.data,
-            partial=True
+            request.user, data=request.data, partial=True
         )
         if serializer.is_valid():
             serializer.save()

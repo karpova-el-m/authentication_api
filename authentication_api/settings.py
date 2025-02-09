@@ -67,7 +67,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "authentication_api.wsgi.application"
 
-ASGI_APPLICATION = 'authentication_api.asgi.application'
+ASGI_APPLICATION = "authentication_api.asgi.application"
 
 DATABASES = {
     "default": dj_database_url.config(

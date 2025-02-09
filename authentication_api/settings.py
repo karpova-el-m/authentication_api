@@ -67,17 +67,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "authentication_api.wsgi.application"
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
+ASGI_APPLICATION = 'authentication_api.asgi.application'
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://api_db_evo6_user:nNxUQcKjy97djjKn5zqilifbYz4TrsyA@dpg-cuk9f55umphs73bbkf90-a/api_db_evo6',
-        conn_max_age=600
+    "default": dj_database_url.config(
+        default="postgresql://api_db_evo6_user:nNxUQcKjy97djjKn5zqilifbYz4TrsyA@dpg-cuk9f55umphs73bbkf90-a/api_db_evo6",
+        conn_max_age=600,
     )
 }
 
@@ -107,8 +102,10 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 if not DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    STATICFILES_STORAGE = (
+        "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    )
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -130,21 +127,14 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-CONSTANCE_BACKEND = 'constance.backends.redisd.RedisBackend'
-
-# CONSTANCE_REDIS_CONNECTION = {
-#     'host': 'my-redis-1234.onrender.com',
-#     'port': 6379,
-#     'password': None,
-#     'decode_responses': True,
-# }
+CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 
 CONSTANCE_REDIS_CONNECTION = {
-    'host': 'red-cujq5156l47c73c5l5hg',
-    'port': 6379,
-    'db': 0,
-    'password': None,
-    'socket_timeout': 5,
+    "host": "red-cujq5156l47c73c5l5hg",
+    "port": 6379,
+    "db": 0,
+    "password": None,
+    "socket_timeout": 5,
 }
 
 CONSTANCE_CONFIG = {
@@ -163,11 +153,13 @@ SIMPLE_JWT = {
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': os.getenv('REDIS_URL', 'redis://red-cujq5156l47c73c5l5hg:6379/1'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv(
+            "REDIS_URL", "redis://red-cujq5156l47c73c5l5hg:6379/1"
+        ),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     }
 }

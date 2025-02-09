@@ -8,9 +8,13 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import (LoginSerializer, LogoutSerializer,
-                          RegisterSerializer, TokenRefreshSerializer,
-                          UserDetailSerializer)
+from .serializers import (
+    LoginSerializer,
+    LogoutSerializer,
+    RegisterSerializer,
+    TokenRefreshSerializer,
+    UserDetailSerializer,
+)
 
 User = get_user_model()
 
